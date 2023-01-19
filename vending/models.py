@@ -13,4 +13,5 @@ class stock(models.Model):
     amount = models.IntegerField(default=0)
     price = models.IntegerField(default=0)
 
- 
+    def __str__(self):
+        return "Vending Machine: " + str(self.vm.id) + " name: " + self.name + " amount: " + str(self.amount) + " price: " + str(self.price)

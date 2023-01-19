@@ -24,7 +24,7 @@ def create_vendingMachine(request):
         new_vm = vendingMachine(name=name, location=location)
         new_vm.save()
         print(vendingMachine.objects.filter(name='vending machine 1').exists())
-        return JsonResponse({'message': f'Vending Machine {new_vm.id} {new_vm.name} at {new_vm.location} is created.'})
+        return JsonResponse({'message': f'Vending Machine {new_vm.id}, {new_vm.name} at {new_vm.location} is created.'})
 
 ## Edit a vending machine with the specified id where it will check if the vending machine exists.
 ## Can either change the name or location.
@@ -62,6 +62,7 @@ def delete_vendingMachine(request):
     else:
         return JsonResponse({'message': 'Vending Machine does not exsits.'})
 
+## List all the vending machines in the database.
 def list_vendingMachine(request):
     vm = vendingMachine.objects.all()
     vm_data = []
@@ -71,4 +72,25 @@ def list_vendingMachine(request):
 
     return JsonResponse({'Vending Machines' : vm_data})
 
+## Add an item, item amount and item price into a specified vending machine.
+@csrf_exempt
+def add_item(request):
+    if request.method == 'POST':
+        vm_id = request.POST.get('id')
+        name = request.POST.get('name')
+        amount = request.POST.get('amount')
+        price = request.POST.get('price')
 
+        if not vendingMachine.objects.filter(id=vm_id).exists():
+            return JsonResponse({'message' : 'Vending Machine does not exists.'})
+        print(name)
+        print(amount)
+        print(price)
+
+        vm = vendingMachine.objects.get(id=vm_id)
+        new_item = stock.objects.create(vm=vm, name=name, amount=amount, price=price)
+        print(new_item.name)
+        print(new_item.amount)
+        print(new_item.price)
+
+        return JsonResponse({'message' : f'{new_item.amount} {new_item.name} is added into vending machine {vm_id}.'})
