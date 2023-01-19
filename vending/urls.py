@@ -20,7 +20,8 @@ from .views import (create_vendingMachine,
                     delete_vendingMachine, 
                     list_vendingMachine,
                     add_item,
-                    edit_item)
+                    edit_item,
+                    delete_item)
 
 urlpatterns = [
     path('vendingMachine/create/', create_vendingMachine, name='create_vendingMachine'),
@@ -29,6 +30,7 @@ urlpatterns = [
     path('vendingMachine/list/', list_vendingMachine, name='list_vendingMachine'),
     path('stock/add/', add_item, name='add_item'),
     path('stock/edit/', edit_item, name='edit_item'),
+    path("stock/delete/", delete_item, name="delete_item"),
     path('admin/', admin.site.urls),
 
 ]

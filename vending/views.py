@@ -9,10 +9,13 @@ import json
 @csrf_exempt
 def create_vendingMachine(request):
     if request.method == 'POST':
+        # checks if it's a json
         if request.content_type == "application/json":
             json_data = json.loads(request.body)
             name = json_data.get('name')
             location = json_data.get('location')
+            
+            # Checks if the name already exists.
             if vendingMachine.objects.filter(name=name).exists():
                 return JsonResponse({'message': 'Vending Machine already exists.'})
         else:
@@ -94,6 +97,7 @@ def add_item(request):
         else:
             return JsonResponse({'message' : 'Vending Machine does not exists.'})
 
+## Edit the edit of the specified name and vending machine.
 @csrf_exempt
 def edit_item(request):
     if request.method == 'POST':
@@ -126,7 +130,25 @@ def edit_item(request):
         else:
             return JsonResponse({'message' : 'The vending machine does not exists.'})
 
+## Delete the item from the specified vending machine.
+@csrf_exempt
+def delete_item(request):
+    if request.method == 'POST':
+        vm_id = request.POST.get('id')
+        # checks if the vending machine exists
+        if vendingMachine.objects.filter(id=vm_id).exists():
+            name = request.POST.get('name')
+            vm = vendingMachine.objects.get(id=vm_id)
+            # checks if the item exisits in the vending machine
+            if not stock.objects.filter(vm=vm, name=name).exists():
+                return JsonResponse({'message' : 'The item does not exists in the vending machine.'})
+            
+            item = stock.objects.get(vm=vm, name=name)
+            item.delete()
 
+            return JsonResponse({'message' : f'{name} in vending machine {vm_id} has been successfully removed.'})
+        else:
+            return JsonResponse({'message' : 'The vending machine does not exists.'})
 
 
 
