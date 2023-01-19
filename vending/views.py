@@ -77,20 +77,23 @@ def list_vendingMachine(request):
 def add_item(request):
     if request.method == 'POST':
         vm_id = request.POST.get('id')
-        name = request.POST.get('name')
-        amount = request.POST.get('amount')
-        price = request.POST.get('price')
 
-        if not vendingMachine.objects.filter(id=vm_id).exists():
+        if vendingMachine.objects.filter(id=vm_id).exists():
+            name = request.POST.get('name')
+            amount = request.POST.get('amount')
+            price = request.POST.get('price')
+            vm = vendingMachine.objects.get(id=vm_id)
+            
+            ## Checks if the item is already in the vending machine.
+            if stock.objects.filter(vm=vm, name=name).exists():
+                return JsonResponse({'message' : f'Vending Machine {vm_id} already has this item listed.'})
+
+            new_item = stock.objects.create(vm=vm, name=name, amount=amount, price=price)
+
+            return JsonResponse({'message' : f'{new_item.amount} {new_item.name} is added into vending machine {vm_id}.'})
+        else:
             return JsonResponse({'message' : 'Vending Machine does not exists.'})
-        print(name)
-        print(amount)
-        print(price)
 
-        vm = vendingMachine.objects.get(id=vm_id)
-        new_item = stock.objects.create(vm=vm, name=name, amount=amount, price=price)
-        print(new_item.name)
-        print(new_item.amount)
-        print(new_item.price)
 
-        return JsonResponse({'message' : f'{new_item.amount} {new_item.name} is added into vending machine {vm_id}.'})
+
+
