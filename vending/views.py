@@ -24,7 +24,7 @@ def create_vendingMachine(request):
         new_vm = vendingMachine(name=name, location=location)
         new_vm.save()
         print(vendingMachine.objects.filter(name='vending machine 1').exists())
-        return JsonResponse({'message': f'Vending Machine {new_vm.name} at {new_vm.location} is created.'})
+        return JsonResponse({'message': f'Vending Machine {new_vm.id} {new_vm.name} at {new_vm.location} is created.'})
 
 ## Edit a vending machine with the specified id where it will check if the vending machine exists.
 ## Can either change the name or location.
@@ -61,4 +61,14 @@ def delete_vendingMachine(request):
         return JsonResponse({'message': f'Vending Machine {vm_id} has been succesfully deleted.'})
     else:
         return JsonResponse({'message': 'Vending Machine does not exsits.'})
+
+def list_vendingMachine(request):
+    vm = vendingMachine.objects.all()
+    vm_data = []
+
+    for i in vm:
+        vm_data.append({'id': i.id, 'name': i.name, 'location': i.location})
+
+    return JsonResponse({'Vending Machines' : vm_data})
+
 

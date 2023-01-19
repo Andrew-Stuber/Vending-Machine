@@ -15,12 +15,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from .views import create_vendingMachine, edit_vendingMachine, delete_vendingMachine
+from .views import create_vendingMachine, edit_vendingMachine, delete_vendingMachine, list_vendingMachine
 
 urlpatterns = [
     path('vendingMachine/create/', create_vendingMachine, name='create_vendingMachine'),
     path('vendingMachine/edit/', edit_vendingMachine, name='edit_vendingMachine'),
     path('vendingMachine/delete/', delete_vendingMachine, name='delete_vendingMachine'),
+    path('vendingMachine/list/', list_vendingMachine, name='list_vendingMachine'),
     path('admin/', admin.site.urls),
 
 ]
