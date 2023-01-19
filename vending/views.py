@@ -94,6 +94,39 @@ def add_item(request):
         else:
             return JsonResponse({'message' : 'Vending Machine does not exists.'})
 
+@csrf_exempt
+def edit_item(request):
+    if request.method == 'POST':
+        vm_id = request.POST.get('id')
+
+        if vendingMachine.objects.filter(id=vm_id).exists():
+            name = request.POST.get('name')
+            new_name = request.POST.get('new name', None)
+            new_amount = request.POST.get('new amount', None)
+            new_price = request.POST.get('new price', None)
+
+            vm = vendingMachine.objects.get(id=vm_id)
+
+            # Checks if the item exists in the vending machine.
+            if not stock.objects.filter(vm=vm, name=name).exists():
+                return JsonResponse({'message' : f'Item does not exist in vending machine {vm_id}'})
+
+            item = stock.objects.get(vm=vm, name=name)
+
+            if new_name:
+                item.name = new_name
+            if new_amount:
+                item.amount = new_amount
+            if new_price:
+                item.price = new_price
+
+            item.save()
+
+            return JsonResponse({'message' : f'The item in vending machine {vm_id} is updated.'})
+        else:
+            return JsonResponse({'message' : 'The vending machine does not exists.'})
+
+
 
 
 
