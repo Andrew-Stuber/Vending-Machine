@@ -67,13 +67,12 @@ def delete_vendingMachine(request):
 
 ## List all the vending machines in the database.
 def list_vendingMachine(request):
-    vm = vendingMachine.objects.all()
-    vm_data = []
+    vm_list = []
 
-    for i in vm:
-        vm_data.append({'id': i.id, 'name': i.name, 'location': i.location})
+    for i in vendingMachine.objects.all():
+        vm_list.append({'id': i.id, 'name': i.name, 'location': i.location})
 
-    return JsonResponse({'Vending Machines' : vm_data})
+    return JsonResponse({'Vending Machines' : vm_list})
 
 ## Add an item, item amount and item price into a specified vending machine.
 @csrf_exempt
@@ -150,5 +149,26 @@ def delete_item(request):
         else:
             return JsonResponse({'message' : 'The vending machine does not exists.'})
 
+## Lists all items in the specified vending machine.
+@csrf_exempt
+def list_items(request):
+    if request.method == 'POST':
+        vm_id = request.POST.get('id')
+        if vendingMachine.objects.filter(id=vm_id).exists():
+            vm = vendingMachine.objects.get(id=vm_id)
+            items = stock.objects.filter(vm=vm).all()
+            item_list = []
+            
+            # When the vending machine is empty.
+            if len(item_list) == 0:
+                return JsonResponse({'message' : f'Vending machine {vm_id} is empty.'})
+
+            for i in items:
+                item_list.append({'name': i.name, 'amount': i.amount, 'price': i.price})
+
+            return JsonResponse({f'items in vending machine {vm_id}' : item_list})
+        else:
+            return JsonResponse({'message' : 'The vending machine does not exists.'})
+        
 
 
