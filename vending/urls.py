@@ -15,14 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from .views import (create_vendingMachine, 
-                    edit_vendingMachine, 
-                    delete_vendingMachine, 
+from .views import (create_vendingMachine,
+                    edit_vendingMachine,
+                    delete_vendingMachine,
                     list_vendingMachine,
                     add_item,
                     edit_item,
                     delete_item,
-                    list_items)
+                    list_items,
+                    list_time)
 
 urlpatterns = [
     path('vendingMachine/create/', create_vendingMachine, name='create_vendingMachine'),
@@ -33,6 +34,7 @@ urlpatterns = [
     path('stock/edit/', edit_item, name='edit_item'),
     path("stock/delete/", delete_item, name="delete_item"),
     path("stock/list/", list_items, name="list_items"),
+    path("time/list/", list_time, name="list_time"),
     path('admin/', admin.site.urls),
 
 ]
