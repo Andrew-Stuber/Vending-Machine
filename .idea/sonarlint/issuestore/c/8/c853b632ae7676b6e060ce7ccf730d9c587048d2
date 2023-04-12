@@ -1,0 +1,10 @@
+
+ƒpython:S1192‚"eDefine a constant instead of duplicating this literal 'The vending machine does not exists.' 3 times.(Ñ„Ûûÿÿÿÿ
+rpython:S1542
+"[Rename function "create_vendingMachine" to match the regular expression ^[a-z_][a-z0-9_]*$.(ÒÈ)
+qpython:S1542#"YRename function "edit_vendingMachine" to match the regular expression ^[a-z_][a-z0-9_]*$.(¨ô‘‚
+6python:S125$"Remove this commented out code.(œ íø
+xpython:S1542;"[Rename function "delete_vendingMachine" to match the regular expression ^[a-z_][a-z0-9_]*$.(¥üäÉûÿÿÿÿ
+Lpython:S1172E"/Remove the unused function parameter "request".(ÅÀğÓúÿÿÿÿ
+vpython:S1542E"YRename function "list_vendingMachine" to match the regular expression ^[a-z_][a-z0-9_]*$.(ÅÀğÓúÿÿÿÿ
+qpython:S3776e"TRefactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.(şÅ›•øÿÿÿÿ
