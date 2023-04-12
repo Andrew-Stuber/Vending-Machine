@@ -1,8 +1,10 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
-from .models import vendingMachine, stock
+from .models import vendingMachine, stock, time
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
 import json
+
 
 ## create a vending machine with name and location. This will work with both Json and form-data input
 ## where it will check if the vending machine already exists, so it will stop duplicates.
@@ -25,14 +27,16 @@ def create_vendingMachine(request):
             
         new_vm = vendingMachine(name=name, location=location)
         new_vm.save()
+        time.objects.create(container=new_vm, key=timezone.now())
         print(vendingMachine.objects.filter(name='vending machine 1').exists())
         return JsonResponse({'message': f'Vending Machine {new_vm.id}, {new_vm.name} at {new_vm.location} is created.'})
+
 
 ## Edit a vending machine with the specified id where it will check if the vending machine exists.
 ## Can either change the name or location.
 @csrf_exempt
 def edit_vendingMachine(request):
-    #vm = get_object_or_404(vendingMachine, id=id)
+    # vm = get_object_or_404(vendingMachine, id=id)
     if request.method == 'POST':
         vm_id = request.POST.get('id')
         new_name = request.POST.get('new name', None)
@@ -53,6 +57,7 @@ def edit_vendingMachine(request):
 
         return JsonResponse({'message': f'Vending Machine {vm_id} is edited.'})
 
+
 ## Delete a vending machine with specified id where it will check if it exists first.
 @csrf_exempt
 def delete_vendingMachine(request):
@@ -66,6 +71,7 @@ def delete_vendingMachine(request):
     vm.delete()
 
     return JsonResponse({'message': f'Vending Machine {vm_id} has been succesfully deleted.'})
+
 
 ## List all the vending machines in the database.
 @csrf_exempt
@@ -93,6 +99,16 @@ def add_item(request):
         if stock.objects.filter(vm=vm, name=name).exists():
             return JsonResponse({'message' : f'Vending Machine {vm_id} already has this item listed.'})
 
+        stock_timestamp = []
+        for stocks in vm.stock_set.all():
+            stock_timestamp.append({
+                'id': stocks.id,
+                'name': stocks.name,
+                'price': stocks.price,
+                'amount': stocks.amount
+            })
+        time.objects.create(container=vm, key=timezone.now(), item=stock_timestamp)
+
         new_item = stock.objects.create(vm=vm, name=name, amount=amount, price=price)
 
         return JsonResponse({'message' : f'{new_item.amount} {new_item.name} is added into vending machine {vm_id}.'})
@@ -115,7 +131,17 @@ def edit_item(request):
 
         # Checks if the item exists in the vending machine.
         if not stock.objects.filter(vm=vm, name=name).exists():
-            return JsonResponse({'message' : f'Item does not exist in vending machine {vm_id}'})
+            return JsonResponse({'message': f'Item does not exist in vending machine {vm_id}'})
+            
+        stock_timestamp = []
+        for stocks in vm.stock_set.all():
+            stock_timestamp.append({
+                'id': stocks.id,
+                'name': stocks.name,
+                'price': stocks.price,
+                'amount': stocks.amount
+            })
+        time.objects.create(container=vm, key=timezone.now(), item=stock_timestamp)
 
         item = stock.objects.get(vm=vm, name=name)
 
@@ -145,11 +171,22 @@ def delete_item(request):
         # checks if the item exisits in the vending machine
         if not stock.objects.filter(vm=vm, name=name).exists():
             return JsonResponse({'message' : 'The item does not exists in the vending machine.'})
+
+        stock_timestamp = []
+        for stocks in vm.stock_set.all():
+            stock_timestamp.append({
+                'id': stocks.id,
+                'name': stocks.name,
+                'price': stocks.price,
+                'amount': stocks.amount
+            })
+        time.objects.create(container=vm, key=timezone.now(), item=stock_timestamp)
         
         item = stock.objects.get(vm=vm, name=name)
         item.delete()
 
         return JsonResponse({'message' : f'{name} in vending machine {vm_id} has been successfully removed.'})
+    
 
 ## Lists all items in the specified vending machine.
 @csrf_exempt
@@ -164,14 +201,30 @@ def list_items(request):
 
         items = stock.objects.filter(vm=vm).all()
         item_list = []
+
+        for i in items:
+            item_list.append({'name': i.name, 'amount': i.amount, 'price': i.price})
         
         # When the vending machine is empty.
         if len(item_list) == 0:
             return JsonResponse({'message' : f'Vending machine {vm_id} is empty.'})
-        for i in items:
-            item_list.append({'name': i.name, 'amount': i.amount, 'price': i.price})
 
         return JsonResponse({f'items in vending machine {vm_id}' : item_list})
         
 
 
+@csrf_exempt
+def list_time(request):
+    if request.method == 'POST':
+        vm_id = request.POST.get('id')
+        if vendingMachine.objects.filter(id=vm_id).exists():
+            vm = vendingMachine.objects.get(id=vm_id)
+            times = time.objects.filter(container=vm).all()
+            time_list = []
+
+            for i in times:
+                time_list.append({'time': i.key, 'items': i.item})
+
+            return JsonResponse({f'time stamp in vending machine {vm_id}': time_list})
+        else:
+            return JsonResponse({'message': 'The vending machine does not exists.'})
